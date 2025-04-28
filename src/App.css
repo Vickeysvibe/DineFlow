@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1b1b1b;
+  --color-secondary: #292929;
+  --color-white: #ffffff;
+  --color-accent: #e52020;
+  --font-actual: "Outfit", sans-serif;
+  --text-color: #ffffff;
+
+  /* Font sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 18px;
+  --text-lg: 22px;
+  --text-xl: 28px;
+}
+
+body {
+  font-family: var(--font-actual);
+  color: var(--text-color);
+  background-color: var(--color-primary); /* optional for better contrast */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
