@@ -24,10 +24,10 @@ const Cart = () => {
           <Header title="Cart" />
 
           {/* Cart Items */}
-          <div className="flex-1 bg-primary rounded-t-4xl p-4 drop-shadow-2xl drop-shadow-black">
+          <div className="flex-1 bg-primary rounded-t-4xl p-4">
             <div
               className={`${
-                cart.length > 0 ? "h-[calc(100dvh-250px)]" : "h-full"
+                cart.length > 0 ? "h-[63dvh]" : "h-full"
               } overflow-y-auto space-y-4 pr-1 no-scrollbar rounded-3xl`}
             >
               {cart?.length > 0 ? (

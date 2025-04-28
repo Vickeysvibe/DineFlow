@@ -27,7 +27,7 @@ const Orders = () => {
           <Header title="Orders" />
 
           {/* Cart Items */}
-          <div className="flex-1 bg-primary rounded-t-4xl p-4 drop-shadow-2xl drop-shadow-black">
+          <div className="flex-1 bg-primary rounded-t-4xl p-4">
             <div
               className={`${
                 cart.length > 0 ? "h-[60dvh]" : "h-full"
