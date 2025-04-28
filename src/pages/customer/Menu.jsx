@@ -5,37 +5,38 @@ import Header from "../../components/Header";
 import Items from "../../components/Items";
 import BelowArea from "../../components/BelowArea";
 import Filter from "../../components/Filter";
-import { motion, useAnimation } from "framer-motion";
+import { motion } from "framer-motion";
 import useAppStore from "../../store/useAppStore";
+import BottomSheet from "../../components/BottomSheet";
 
 const Menu = () => {
   const [isReady, setIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(false);
   const [filter, setFilter] = useState("All");
+  const [popupItem, setPopupItem] = useState(null);
+
   const fakeFoodData = useAppStore((state) => state.fakeFoodData);
   const cart = useAppStore((state) => state.cart);
+  const addToCart = useAppStore((state) => state.addToCart);
 
   const [filteredData, setFilteredData] = useState(fakeFoodData);
 
   useEffect(() => {
     const lastVisit = localStorage.getItem("lastVisitTime");
     const now = new Date().getTime();
-
-    const cooldownTime = 1 * 60 * 60 * 1000; // 1 hour cooldown (in milliseconds)
-    // if you want 24 hours cooldown, use: 24 * 60 * 60 * 1000
+    const cooldownTime = 1 * 60 * 60 * 1000; // 1 hour cooldown
 
     if (!lastVisit || now - parseInt(lastVisit) > cooldownTime) {
-      setShowSplash(true); // Show splash if it has been more than cooldown time or first time
+      setShowSplash(true);
     } else {
-      setShowSplash(false); // Don't show splash if within cooldown
+      setShowSplash(false);
     }
-  }, []); // Runs only once on page load
+  }, []);
 
   useEffect(() => {
     if (!fakeFoodData || fakeFoodData.length === 0) return;
 
     const preloadAssets = async () => {
-      // Preload food images
       await Promise.all(
         fakeFoodData.map((item) => {
           return new Promise((resolve) => {
@@ -47,7 +48,6 @@ const Menu = () => {
         })
       );
 
-      // Preload background images
       await Promise.all(
         ["/src/assets/bg.png", "/src/assets/backlight.png"].map((src) => {
           return new Promise((resolve) => {
@@ -63,7 +63,7 @@ const Menu = () => {
     };
 
     preloadAssets();
-  }, [fakeFoodData]); // <-- 🔁 rerun when data becomes available
+  }, [fakeFoodData]);
 
   useEffect(() => {
     setFilteredData(
@@ -71,28 +71,27 @@ const Menu = () => {
         ? fakeFoodData
         : fakeFoodData.filter((item) => item.category === filter)
     );
-  }, [filter, fakeFoodData]); // <-- ✅ Add this
+  }, [filter, fakeFoodData]);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
-    localStorage.setItem("lastVisitTime", new Date().getTime().toString()); // Save the current time
+    localStorage.setItem("lastVisitTime", new Date().getTime().toString());
   };
+
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden">
-      {/* Splash Screen - rendered simultaneously with menu */}
       <AnimatePresence>
         {showSplash && (
           <SplashScreen onComplete={handleSplashComplete} isReady={isReady} />
         )}
       </AnimatePresence>
 
-      {/* Menu Content - always rendered but hidden initially */}
       <motion.div
         className="absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{
           opacity: showSplash ? 0 : 1,
-          transition: { delay: 0.2 }, // Slight delay for smoother transition
+          transition: { delay: 0.2 },
         }}
       >
         <div className="bg-[url('/src/assets/bg.png')] h-full w-full bg-contain bg-center flex flex-col">
@@ -101,12 +100,39 @@ const Menu = () => {
             <Filter filter={filter} change={setFilter} />
             <div className="h-full overflow-y-scroll rounded-t-4xl">
               {filteredData?.map((item, index) => (
-                <Items key={`${item.name}-${index}`} {...item} />
+                <Items
+                  key={`${item.name}-${index}`}
+                  {...item}
+                  openPopup={setPopupItem}
+                />
               ))}
               <div className={`${cart.length > 0 ? "h-32" : "h-15"}`} />
             </div>
           </div>
+
+          {/* BelowArea stays always below */}
           {cart.length > 0 && <BelowArea items={cart.length} />}
+
+          {/* Global BottomSheet above BelowArea */}
+          {popupItem && (
+            <BottomSheet
+              onClose={() => setPopupItem(null)}
+              onSubmit={(data) => {
+                addToCart({
+                  name: popupItem.name,
+                  price: popupItem.price,
+                  pic: popupItem.pic,
+                  qty: popupItem.qty,
+                  prepTime: popupItem.prepTime,
+                  nos: data.quantity,
+                  selectedAddons: data.selectedAddons,
+                });
+                setPopupItem(null);
+              }}
+              basePrice={popupItem.price}
+              name={popupItem.name}
+            />
+          )}
         </div>
       </motion.div>
     </div>

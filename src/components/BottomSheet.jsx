@@ -19,7 +19,10 @@ const BottomSheet = ({ onClose, onSubmit, basePrice, name }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit({ quantity, selectedAddons });
+    setIsOpen(false);
+    setTimeout(() => {
+      onSubmit({ quantity, selectedAddons });
+    }, 300);
   };
 
   const totalAddonPrice = selectedAddons.length * 20;

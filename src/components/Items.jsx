@@ -1,48 +1,21 @@
-import { memo, useState } from "react";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import { memo } from "react";
 import AddButton from "./AddButton";
 import useAppStore from "../store/useAppStore";
-import BottomSheet from "./BottomSheet";
 import veg from "../assets/veg.svg";
 import nonveg from "../assets/nonveg.svg";
 
-const Items = memo(({ name, price, pic, qty, prepTime, type }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-
+const Items = memo(({ name, price, pic, qty, prepTime, type, openPopup }) => {
   const cart = useAppStore((state) => state.cart);
   const alreadyInCart = cart.some((item) => item.name === name);
 
-  const addToCart = useAppStore((state) => state.addToCart);
   const removeFromCart = useAppStore((state) => state.removeFromCart);
-
-  const toggleExpand = () => {
-    setExpanded((prev) => !prev);
-  };
 
   const handleAddButtonClick = () => {
     if (alreadyInCart) {
       removeFromCart(name);
     } else {
-      setShowPopup(true); // Open BottomSheet
+      openPopup({ name, price, pic, qty, prepTime });
     }
-  };
-
-  const handleBottomSheetSubmit = (data) => {
-    addToCart({
-      name,
-      price,
-      pic,
-      qty,
-      prepTime,
-      nos: data.quantity,
-      selectedAddons: data.selectedAddons,
-    });
-    setShowPopup(false);
-  };
-
-  const handleBottomSheetClose = () => {
-    setShowPopup(false);
   };
 
   return (
@@ -96,15 +69,6 @@ const Items = memo(({ name, price, pic, qty, prepTime, type }) => {
           </div>
         </div>
       </div>
-
-      {showPopup && (
-        <BottomSheet
-          onClose={handleBottomSheetClose}
-          onSubmit={handleBottomSheetSubmit}
-          basePrice={price}
-          name={name}
-        />
-      )}
     </div>
   );
 });
